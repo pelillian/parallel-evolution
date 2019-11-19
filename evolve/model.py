@@ -14,6 +14,10 @@ class Model:
         """Use model to predict y given X."""
         pass
 
+    @property
+    def param_shape(X_shape):
+        pass
+
 class LinearModel(Model):
     def __init__(self):
         """Defines a linear predictor."""
@@ -27,13 +31,21 @@ class LinearModel(Model):
         y = np.sum(output)
         return y
 
+    @property
+    def param_shape(X_shape):
+        return (2,) + X_shape
+
 class NeuralModel(Model):
     def __init__(self):
-        """Defines a linear predictor."""
+        """Defines a neural network predictor."""
         raise NotImplementedError
 
     def predict(self, X, params):
         """Use neural model to predict y given X. Input: np.ndarray."""
+        pass
+
+    @property
+    def param_shape(X_shape):
         pass
 
 def get_model(model_type):
