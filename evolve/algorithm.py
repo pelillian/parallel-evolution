@@ -7,7 +7,7 @@ import numpy as np
 from evolve.model import get_model
 
 
-def train(model_type, pop_size=10):
+def train(model_type, pop_size=10, num_gen=100):
     """Primary train loop."""
     model = get_model(model_type)
 

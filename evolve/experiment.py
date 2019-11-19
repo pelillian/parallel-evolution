@@ -9,7 +9,7 @@ from evolve.algorithm import train, test
 def main():
     args = read_args()
     if args.objective == 'train':
-        train(args.model, pop_size=args.population)
+        train(args.model, pop_size=args.population, num_gen=args.generations)
     elif args.objective == 'test':
         test(args.model)
     else:
