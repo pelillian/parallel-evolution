@@ -17,6 +17,9 @@ def train(model_type, pop_size=10, num_gen=100):
     pop_shape = (pop_size,) + model.param_shape(dataset[0].shape)
     population = np.random.rand(*pop_shape)
 
+    for gen in range(num_gen):
+        pass
+
 def test(model_type):
     pass
 
