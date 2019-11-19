@@ -36,3 +36,9 @@ class NeuralModel(Model):
         """Use neural model to predict y given X. Input: np.ndarray."""
         pass
 
+def get_model(model_type):
+    if model_type == 'linear':
+        return LinearModel()
+    elif model_type == 'neural':
+        return NeuralModel()
+
