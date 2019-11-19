@@ -27,3 +27,12 @@ class LinearModel(Model):
         y = np.sum(output)
         return y
 
+class NeuralModel(Model):
+    def __init__(self):
+        """Defines a linear predictor."""
+        raise NotImplementedError
+
+    def predict(self, X, params):
+        """Use neural model to predict y given X. Input: np.ndarray."""
+        pass
+
