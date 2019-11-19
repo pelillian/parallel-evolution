@@ -14,8 +14,7 @@ class Model:
         """Use model to predict y given X."""
         pass
 
-    @property
-    def param_shape(X_shape):
+    def param_shape(self, X_shape):
         pass
 
 class LinearModel(Model):
@@ -31,8 +30,9 @@ class LinearModel(Model):
         y = np.sum(output)
         return y
 
-    @property
-    def param_shape(X_shape):
+    def param_shape(self, X_shape):
+        if type(X_shape) is not tuple:
+            X_shape = (X_shape,)
         return (2,) + X_shape
 
 class NeuralModel(Model):
@@ -44,8 +44,7 @@ class NeuralModel(Model):
         """Use neural model to predict y given X. Input: np.ndarray."""
         pass
 
-    @property
-    def param_shape(X_shape):
+    def param_shape(self, X_shape):
         pass
 
 def get_model(model_type):
