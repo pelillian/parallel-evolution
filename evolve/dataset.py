@@ -16,7 +16,9 @@ def get_mnist():
   permutation = random_state.permutation(X.shape[0])
   X = X[permutation]
   y = y[permutation]
+  y = y.astype(np.int)
   X = X.reshape((X.shape[0], -1))
+  X /= 255
   X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_samples, test_size=10000)
   return X_train, X_test, y_train, y_test
 
