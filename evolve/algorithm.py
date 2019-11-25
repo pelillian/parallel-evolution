@@ -18,7 +18,17 @@ def train(model_type, pop_size=10, num_gen=100):
     population = np.random.rand(*pop_shape)
 
     for gen in range(num_gen):
-        pass
+        for individual in population:
+            fitness = eval(model, params, dataset)
+
+def eval(model, params, dataset):
+    """This method calculates fitness given a model, its parameters, and a dataset."""
+    fitness = []
+    for X in dataset:
+        y_pred = model.predict(X, params)
+        #TODO: compare y_pred and y
+    mean_fitness = np.mean(fitness)
+    return mean_fitness
 
 def test(model_type):
     pass
