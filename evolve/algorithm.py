@@ -3,6 +3,7 @@ This module implements the evolutionary algorithm.
 """
 
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 from evolve.model import get_model
 
@@ -23,9 +24,10 @@ def train(model_type, pop_size=10, num_gen=100):
 def eval(model, params, X_train, y_train):
     """This method calculates fitness given a model, its parameters, and a dataset."""
     fitness = []
-    for X in X_train:
+    for X, y_true in zip(X_train, y_train):
         y_pred = model.predict(X, params)
-        #TODO: compare y_pred and y
+        accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
+        fitness.append(accuracy)
     mean_fitness = np.mean(fitness)
     return mean_fitness
 
