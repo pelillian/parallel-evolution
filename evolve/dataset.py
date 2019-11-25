@@ -18,5 +18,5 @@ def get_mnist():
   y = y[permutation]
   X = X.reshape((X.shape[0], -1))
   X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_samples, test_size=10000)
-  return (X_train, X_test, y_train, y_test)
+  return X_train, X_test, y_train, y_test
 

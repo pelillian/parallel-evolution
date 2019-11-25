@@ -11,7 +11,7 @@ def train(model_type, pop_size=10, num_gen=100):
     """Primary train loop."""
     model = get_model(model_type)
 
-    dataset = get_mnist()
+    X_train, X_test, y_train, y_test = get_mnist()
 
     pop_shape = (pop_size,) + model.param_shape(dataset[0].shape)
     population = np.random.rand(*pop_shape)
