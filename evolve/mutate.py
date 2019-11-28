@@ -1,13 +1,12 @@
 """
-This module mutates the data for each generation
+This module mutates a given individual.
 """
 
 import numpy as np
-def add_noise_to_array(mu, array):
-  sigma = np.std(array)
-  # mu is the mean
-  # sigma is the standard deviation of the normal distribution
+
+
+def add_noise_to_array(array, mu=0, sigma=0.5):
+  # In the normal distribution, mu is the mean, and sigma is the standard deviation
   noise = np.random.normal(mu, sigma, len(array))
-  noisy_array = array + noise
-  return noisy_array
+  return array + noise
 
