@@ -122,3 +122,7 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+# Project-specific
+checkpoints
+

@@ -2,7 +2,9 @@
 This module implements the evolutionary algorithm.
 """
 
+import os
 import numpy as np
+from datetime import datetime
 from sklearn.metrics import accuracy_score
 from dowel import logger, tabular
 
@@ -13,6 +15,9 @@ from evolve.mutate import add_noise_to_array
 
 def train(model_type, pop_size=10, num_gen=100, fit_cutoff=60, noise_sigma=2):
     """Primary train loop."""
+    os.makedirs('checkpoints', exist_ok=True)
+    checkpoint = os.path.join('checkpoints', model_type + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S"))
+
     X_train, X_test, y_train, y_test = get_mnist()
     logger.log('Loaded Dataset')
 
@@ -53,6 +58,8 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=60, noise_sigma=2):
 
         logger.log(tabular)
         logger.dump_all()
+
+        np.save(checkpoint, population)
 
 def eval(model, params, X_train, y_train):
     """This method calculates fitness given a model, its parameters, and a dataset."""
