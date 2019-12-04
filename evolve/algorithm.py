@@ -42,12 +42,13 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=60, noise_sigma=2, ch
 
         for idx in unfit_idx:
             choice = np.random.choice([0, 1, 2], p=[0.55, 0.35, 0.1])
+            sigma = np.abs(np.random.normal(mu=0, sigma=noise_sigma))
             if choice == 0:
                 random_fit_individual = fit_individuals[np.random.choice(len(fit_individuals))]
-                population[idx] = add_noise_to_array(random_fit_individual, mu=0, sigma=noise_sigma)
+                population[idx] = add_noise_to_array(random_fit_individual, mu=0, sigma=sigma)
             elif choice == 1:
                 random_individual = population[np.random.choice(len(population))]
-                population[idx] = add_noise_to_array(random_individual, mu=0, sigma=noise_sigma)
+                population[idx] = add_noise_to_array(random_individual, mu=0, sigma=sigma)
             else:
                 population[idx] = np.random.rand(*individual_shape)
 
