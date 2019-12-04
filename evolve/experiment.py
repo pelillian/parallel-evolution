@@ -23,6 +23,7 @@ def main():
     logger.add_output(dowel.StdOutput())
     logger.add_output(dowel.TextOutput(log))
     logger.log('Starting Evolutionary Algorithm!')
+    logger.log(str(args))
 
     if args.objective == 'train':
         train(args.model, pop_size=args.population, num_gen=args.generations, fit_cutoff=args.fitness_cutoff, noise_sigma=args.noise_sigma, checkpoint=checkpoint)
