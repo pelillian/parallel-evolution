@@ -52,7 +52,8 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=60, noise_sigma=2, ch
             else:
                 population[idx] = np.random.rand(*individual_shape)
 
-        logger.log(tabular)
+        if gen % 10 == 0:
+            logger.log(tabular)
         logger.dump_all()
         
         if gen % 100 == 0:
