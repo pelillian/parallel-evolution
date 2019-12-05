@@ -3,7 +3,7 @@ This module implements the evolutionary algorithm.
 """
 
 import numpy as np
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import log_loss
 from dowel import logger, tabular
 
 from evolve.model import get_model
@@ -28,7 +28,7 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
         tabular.record('Generation', gen)
 
         for idx, individual in enumerate(population):
-            fitness = eval(model, individual, X_train, y_train)
+            fitness = evaluate(model, individual, X_train, y_train)
             fitness_scores[idx] = fitness
 
         fit_sorted = fitness_scores.argsort()
@@ -59,10 +59,10 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
         if gen % 100 == 0:
             np.save(checkpoint, population)
 
-def eval(model, params, X_train, y_train):
+def evaluate(model, params, X_train, y_train):
     """This method calculates fitness given a model, its parameters, and a dataset."""
     y_pred = model.predict(X_train, params)
-    accuracy = accuracy_score(y_true=y_train, y_pred=y_pred)
+    accuracy = log_loss(y_true=y_train, y_pred=y_pred)
     return accuracy
 
 def test(model_type):
