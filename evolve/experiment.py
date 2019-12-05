@@ -14,7 +14,7 @@ from evolve.algorithm import train, test
 def main():
     args = read_args()
 
-    filename = args.model + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S")
+    filename = args.name + '_' + args.model + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S")
     os.makedirs('checkpoints', exist_ok=True)
     checkpoint = os.path.join('checkpoints', filename + '.npy')
     os.makedirs('logs', exist_ok=True)

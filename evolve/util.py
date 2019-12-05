@@ -13,6 +13,7 @@ def read_args():
     parser.add_argument('--generations', default=100, type=int, help='Number of generations to run experiment')
     parser.add_argument('--fitness_cutoff', default=70, help='Population fitness percentage to replace each generation')
     parser.add_argument('--noise_sigma', default=2, help='Standard deviation of the mutation noise vector')
+    parser.add_argument('--name', help='Experiment name')
     args = parser.parse_args()
     return args
 
