@@ -14,11 +14,13 @@ from evolve.algorithm import train, test
 def main():
     args = read_args()
 
-    filename = args.name + '_' + args.model + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S")
+    filename = args.model + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S")
+    if args.name:
+        filename = args.name + '_' + filename
     os.makedirs('checkpoints', exist_ok=True)
     checkpoint = os.path.join('checkpoints', filename + '.npy')
     os.makedirs('logs', exist_ok=True)
-    log = os.path.join('logs', 'logs' + filename + '.log')
+    log = os.path.join('logs', filename + '.log')
 
     logger.add_output(dowel.StdOutput())
     logger.add_output(dowel.TextOutput(log))
