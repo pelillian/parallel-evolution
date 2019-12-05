@@ -15,6 +15,7 @@ def read_args():
     parser.add_argument('--noise_sigma', default=0.1, type=int, help='Standard deviation of the mutation noise vector')
     parser.add_argument('--name', type=str, help='Experiment name')
     parser.add_argument('--checkpoint', type=str, help='Population checkpoint to resume training')
+    parser.add_argument('--workers', default=1, type=int, help='Number of parallel workers to spawn')
     args = parser.parse_args()
     return args
 

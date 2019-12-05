@@ -10,6 +10,7 @@ import numpy as np
 
 from evolve.util import read_args
 from evolve.algorithm import train, test
+from evolve.dataset import get_mnist
 
 
 def main():
@@ -24,7 +25,9 @@ def main():
 
     population = None
 
-    if args.checkpoint:
+    if args.objective == 'test':
+        filename = 't_' + args.checkpoint
+    elif args.checkpoint:
         filename = 'r_' + args.checkpoint
 
     checkpoint_file = os.path.join('checkpoints', filename + '.npy')
@@ -33,14 +36,20 @@ def main():
     if args.checkpoint:
         population = np.load(os.path.join('checkpoints', args.checkpoint + '.npy'))
 
+    X_train, X_test, y_train, y_test, num_classes = get_mnist()
+    logger.log('Loaded Dataset')
+
     logger.add_output(dowel.StdOutput())
     logger.add_output(dowel.TextOutput(log))
     logger.log('Starting Evolutionary Algorithm!')
     logger.log(str(args))
 
     if args.objective == 'train':
-        train(
+        population = train(
                 args.model,
+                X_train,
+                y_train,
+                num_classes,
                 pop_size=args.population,
                 num_gen=args.generations,
                 fit_cutoff=args.fitness_cutoff,
@@ -48,8 +57,11 @@ def main():
                 checkpoint=checkpoint_file,
                 population=population,
              )
+        test(args.model, population, X_test, y_test, num_classes)
     elif args.objective == 'test':
-        test(args.model)
+        if not args.checkpoint:
+            raise ValueError('checkpoint arg must be set in order to test algorithm')
+        test(args.model, population, X_test, y_test, num_classes)
     else:
         raise NotImplementedError
 
