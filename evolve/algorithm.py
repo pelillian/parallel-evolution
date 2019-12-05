@@ -13,10 +13,10 @@ from evolve.mutate import add_noise_to_array
 
 def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, checkpoint='checkpoint.npy'):
     """Primary train loop."""
-    X_train, X_test, y_train, y_test = get_mnist()
+    X_train, X_test, y_train, y_test, num_classes = get_mnist()
     logger.log('Loaded Dataset')
 
-    model = get_model(model_type, num_classes=max(y_test)+1)
+    model = get_model(model_type, num_classes=num_classes)
 
     individual_shape = model.param_shape(X_train[0].shape)
     pop_shape = (pop_size,) + individual_shape

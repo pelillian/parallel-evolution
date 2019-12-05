@@ -19,6 +19,9 @@ def get_mnist():
   y = y.astype(np.int)
   X = X.reshape((X.shape[0], -1))
   X /= 255
+
+  num_classes = np.max(y) + 1
+#  y = np.eye(num_classes)[y]
   X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_samples, test_size=10000)
-  return X_train, X_test, y_train, y_test
+  return X_train, X_test, y_train, y_test, num_classes
 
