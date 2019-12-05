@@ -11,7 +11,7 @@ from evolve.dataset import get_mnist
 from evolve.mutate import add_noise_to_array
 
 
-def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=1, checkpoint='checkpoint.npy'):
+def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=0.1, checkpoint='checkpoint.npy', population=None):
     """Primary train loop."""
     X_train, X_test, y_train, y_test, num_classes = get_mnist()
     logger.log('Loaded Dataset')
@@ -20,7 +20,10 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=1, ch
 
     individual_shape = model.param_shape(X_train[0].shape)
     pop_shape = (pop_size,) + individual_shape
-    population = np.random.rand(*pop_shape)
+    if population is None:
+        population = np.random.rand(*pop_shape)
+    assert population.shape == pop_shape
+
     fitness_scores = np.zeros(pop_size)
     accuracy_scores = np.zeros(pop_size)
     num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))

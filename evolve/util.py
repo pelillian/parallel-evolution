@@ -12,8 +12,9 @@ def read_args():
     parser.add_argument('--population', default=10, type=int, help='Size of the training population')
     parser.add_argument('--generations', default=100, type=int, help='Number of generations to run experiment')
     parser.add_argument('--fitness_cutoff', default=70, type=int, help='Population fitness percentage to replace each generation')
-    parser.add_argument('--noise_sigma', default=1, type=int, help='Standard deviation of the mutation noise vector')
+    parser.add_argument('--noise_sigma', default=0.1, type=int, help='Standard deviation of the mutation noise vector')
     parser.add_argument('--name', type=str, help='Experiment name')
+    parser.add_argument('--checkpoint', type=str, help='Population checkpoint to resume training')
     args = parser.parse_args()
     return args
 
