@@ -22,7 +22,9 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
     pop_shape = (pop_size,) + individual_shape
     population = np.random.rand(*pop_shape)
     fitness_scores = np.zeros(pop_size)
-    num_fit = int((1 - (fit_cutoff / 100)) * pop_size)
+    num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))
+    if num_fit == pop_size:
+        raise ValueError('fit_cutoff too low')
 
     for gen in range(num_gen):
         tabular.record('Generation', gen)
