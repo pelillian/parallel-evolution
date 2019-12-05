@@ -11,7 +11,7 @@ from evolve.dataset import get_mnist
 from evolve.mutate import add_noise_to_array
 
 
-def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, checkpoint='checkpoint.npy'):
+def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=1, checkpoint='checkpoint.npy'):
     """Primary train loop."""
     X_train, X_test, y_train, y_test, num_classes = get_mnist()
     logger.log('Loaded Dataset')
@@ -22,6 +22,7 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
     pop_shape = (pop_size,) + individual_shape
     population = np.random.rand(*pop_shape)
     fitness_scores = np.zeros(pop_size)
+    accuracy_scores = np.zeros(pop_size)
     num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))
     if num_fit == pop_size:
         raise ValueError('fit_cutoff too low')
@@ -30,17 +31,19 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
         tabular.record('Generation', gen)
 
         for idx, individual in enumerate(population):
-            fitness = evaluate(model, individual, X_train, y_train)
+            fitness, accuracy = evaluate(model, individual, X_train, y_train)
             fitness_scores[idx] = fitness
+            accuracy_scores[idx] = accuracy
 
-        fit_sorted = fitness_scores.argsort()
-        fit_idx = fit_sorted[-num_fit:][::-1]
-        unfit_idx = fit_sorted[:-num_fit][::-1]
+        fit_idx = fitness_scores.argsort()[:num_fit]
+        unfit_idx = fitness_scores.argsort()[num_fit:]
         fit_individuals = population[fit_idx]
-        assert len(fit_individuals) > 0
+        assert 0 < len(fit_individuals) < pop_size
 
-        tabular.record('Fitness Best', np.max(fitness_scores))
+        tabular.record('Fitness Best', np.min(fitness_scores))
         tabular.record('Fitness Mean', np.mean(fitness_scores))
+        tabular.record('Accuracy Best', np.max(accuracy_scores))
+        tabular.record('Accuracy Mean', np.mean(accuracy_scores))
 
         for idx in unfit_idx:
             choice = np.random.choice([0, 1, 2], p=[0.8, 0.2, 0])
@@ -57,15 +60,19 @@ def train(model_type, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=2, ch
         if gen % 10 == 0:
             logger.log(tabular)
         logger.dump_all()
-        
+
         if gen % 100 == 0:
             np.save(checkpoint, population)
 
 def evaluate(model, params, X_train, y_train):
     """This method calculates fitness given a model, its parameters, and a dataset."""
     y_pred = model.predict(X_train, params)
-    accuracy = log_loss(y_true=y_train, y_pred=y_pred)
-    return accuracy
+    fitness = log_loss(y_true=y_train, y_pred=y_pred)
+
+    y_pred_class = np.argmax(y_pred, axis=-1)
+    accuracy = np.sum(y_pred_class == y_train) / len(y_train)
+
+    return fitness, accuracy
 
 def test(model_type):
     pass
