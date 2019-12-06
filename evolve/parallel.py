@@ -1,7 +1,8 @@
 """
-This module implements the evolutionary algorithm.
+This module implements the evolutionary algorithm in parallel.
 """
 
+import ray
 import numpy as np
 from sklearn.metrics import log_loss
 from dowel import logger, tabular
@@ -11,12 +12,12 @@ from evolve.model import get_model
 from evolve.mutate import add_noise_to_array
 
 
-def train(
+def train_master_worker(
             model_type,
             X_train,
             y_train,
             num_classes,
-            num_workers=1, # not used, only for parallel algorithm
+            num_workers=1,
             pop_size=10,
             num_gen=100,
             fit_cutoff=70,
@@ -29,6 +30,8 @@ def train(
         ):
     """Primary train loop."""
     logger.log('Starting Evolutionary Algorithm!')
+    ray.init()
+    logger.log('Initialized Ray')
 
     algorithm_time = datetime.now()
 
@@ -88,15 +91,14 @@ def train(
     return population
 
 def evaluate_population(model, population, X, y):
-    fitness_scores = np.zeros(len(population))
-    accuracy_scores = np.zeros(len(population))
-    for idx, individual in enumerate(population):
-        fitness, accuracy = evaluate_individual(model, individual, X, y)
-        fitness_scores[idx] = fitness
-        accuracy_scores[idx] = accuracy
+    scores = ray.get([evaluate_individual.remote(model, individual, X, y) for individual in population])
+    scores = np.array(scores)
 
+    fitness_scores = scores[:, 0]
+    accuracy_scores = scores[:, 1]
     return fitness_scores, accuracy_scores
 
+@ray.remote
 def evaluate_individual(model, params, X, y):
     """This method calculates fitness given a model, its parameters, and a dataset."""
     y_pred = model.predict(X, params)
@@ -106,21 +108,4 @@ def evaluate_individual(model, params, X, y):
     accuracy = np.sum(y_pred_class == y) / len(y)
 
     return fitness, accuracy
-
-def test(model_type, population, X_test, y_test, num_classes):
-    model = get_model(model_type, num_classes=num_classes)
-
-    fitness_scores, accuracy_scores = evaluate_population(model, population, X_test, y_test)
-
-    tabular.clear()
-    if len(population) > 1:
-        tabular.record('Test Fitness Best', np.min(fitness_scores))
-        tabular.record('Test Fitness Mean', np.mean(fitness_scores))
-        tabular.record('Test Accuracy Best', np.max(accuracy_scores))
-        tabular.record('Test Accuracy Mean', np.mean(accuracy_scores))
-    else:
-        tabular.record('Test Fitness', fitness_scores[0])
-        tabular.record('Test Accuracy', fitness_scores[0])
-    logger.log(tabular)
-    logger.dump_all()
 

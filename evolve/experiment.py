@@ -3,13 +3,15 @@ This module contains the main method from which our experiments are run.
 """
 
 import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
 import dowel
 from dowel import logger, tabular
 from datetime import datetime
 import numpy as np
 
 from evolve.util import read_args
-from evolve.algorithm import train, test
+from evolve.algorithm import test
 from evolve.dataset import get_mnist
 
 
@@ -44,6 +46,13 @@ def main():
     logger.log('Loaded Dataset')
 
     if args.objective == 'train':
+        if args.parallel_strategy is None:
+            from evolve.algorithm import train
+        if args.parallel_strategy == 'distributed':
+            from evolve.parallel import train_distributed as train
+        if args.parallel_strategy == 'master-worker':
+            from evolve.parallel import train_master_worker as train
+
         population = train(
                 args.model,
                 X_train,
@@ -56,6 +65,8 @@ def main():
                 target_accuracy=args.target_accuracy,
                 noise_sigma=args.noise_sigma,
                 checkpoint=checkpoint_file,
+                log_gen=args.log_gen,
+                save_gen=args.save_gen,
                 population=population,
              )
         test(args.model, population, X_test, y_test, num_classes)
