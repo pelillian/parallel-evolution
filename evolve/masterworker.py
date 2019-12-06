@@ -12,15 +12,15 @@ from evolve.model import get_model
 from evolve.mutate import add_noise_to_array
 
 
-def train_master_worker(
+def train(
             model_type,
             X_train,
             y_train,
             num_classes,
-            num_workers=1,
+            num_workers=None,
             pop_size=10,
             num_gen=100,
-            fit_cutoff=70,
+            fit_cutoff=50,
             noise_sigma=0.1,
             checkpoint='checkpoint.npy',
             log_gen=10,
@@ -30,7 +30,7 @@ def train_master_worker(
         ):
     """Primary train loop."""
     logger.log('Starting Evolutionary Algorithm!')
-    ray.init()
+    ray.init(num_cpus=num_workers)
     logger.log('Initialized Ray')
 
     algorithm_time = datetime.now()

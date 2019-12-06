@@ -49,9 +49,9 @@ def main():
         if args.parallel_strategy is None:
             from evolve.algorithm import train
         if args.parallel_strategy == 'distributed':
-            from evolve.parallel import train_distributed as train
+            from evolve.distributed import train
         if args.parallel_strategy == 'master-worker':
-            from evolve.parallel import train_master_worker as train
+            from evolve.masterworker import train
 
         population = train(
                 args.model,
