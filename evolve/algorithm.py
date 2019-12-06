@@ -35,8 +35,6 @@ def train(
         population = np.random.rand(*pop_shape)
     assert population.shape == pop_shape
 
-    fitness_scores = np.zeros(pop_size)
-    accuracy_scores = np.zeros(pop_size)
     num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))
     if num_fit == pop_size:
         raise ValueError('fit_cutoff too low')
@@ -103,8 +101,6 @@ def evaluate_individual(model, params, X, y):
 
 def test(model_type, population, X_test, y_test, num_classes):
     model = get_model(model_type, num_classes=num_classes)
-    fitness_scores = np.zeros(len(population))
-    accuracy_scores = np.zeros(len(population))
 
     fitness_scores, accuracy_scores = evaluate_population(model, population, X_test, y_test)
 
