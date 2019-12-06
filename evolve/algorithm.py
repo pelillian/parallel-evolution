@@ -44,10 +44,7 @@ def train(
     for gen in range(num_gen):
         tabular.record('Generation', gen)
 
-        for idx, individual in enumerate(population):
-            fitness, accuracy = evaluate(model, individual, X_train, y_train)
-            fitness_scores[idx] = fitness
-            accuracy_scores[idx] = accuracy
+        fitness_scores, accuracy_scores = evaluate_population(model, population, X_train, y_train)
 
         fit_idx = fitness_scores.argsort()[:num_fit]
         unfit_idx = fitness_scores.argsort()[num_fit:]
@@ -84,13 +81,23 @@ def train(
 
     return population
 
-def evaluate(model, params, X_train, y_train):
+def evaluate_population(model, population, X, y):
+    fitness_scores = np.zeros(len(population))
+    accuracy_scores = np.zeros(len(population))
+    for idx, individual in enumerate(population):
+        fitness, accuracy = evaluate_individual(model, individual, X, y)
+        fitness_scores[idx] = fitness
+        accuracy_scores[idx] = accuracy
+
+    return fitness_scores, accuracy_scores
+
+def evaluate_individual(model, params, X, y):
     """This method calculates fitness given a model, its parameters, and a dataset."""
-    y_pred = model.predict(X_train, params)
-    fitness = log_loss(y_true=y_train, y_pred=y_pred)
+    y_pred = model.predict(X, params)
+    fitness = log_loss(y_true=y, y_pred=y_pred)
 
     y_pred_class = np.argmax(y_pred, axis=-1)
-    accuracy = np.sum(y_pred_class == y_train) / len(y_train)
+    accuracy = np.sum(y_pred_class == y) / len(y)
 
     return fitness, accuracy
 
@@ -99,10 +106,7 @@ def test(model_type, population, X_test, y_test, num_classes):
     fitness_scores = np.zeros(len(population))
     accuracy_scores = np.zeros(len(population))
 
-    for idx, individual in enumerate(population):
-        fitness, accuracy = evaluate(model, individual, X_test, y_test)
-        fitness_scores[idx] = fitness
-        accuracy_scores[idx] = accuracy
+    fitness_scores, accuracy_scores = evaluate_population(model, population, X_test, y_test)
 
     tabular.clear()
     if len(population) > 1:
