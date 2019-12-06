@@ -8,7 +8,7 @@ import argparse
 def read_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--objective', default='train', choices=['train', 'test'], help='Objective: train or test?')
-    parser.add_argument('--model', default='linear', choices=['linear', 'neural'], help='Type of model to use for the experiment')
+    parser.add_argument('--model', default='linear', choices=['linear'], help='Type of model to use for the experiment')
     parser.add_argument('--population', default=512, type=int, help='Size of the training population')
     parser.add_argument('--generations', default=5000, type=int, help='Number of generations to run experiment')
     parser.add_argument('--fitness_cutoff', default=50, type=int, help='Population fitness percentage to replace each generation')

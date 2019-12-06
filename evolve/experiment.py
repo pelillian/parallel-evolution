@@ -21,6 +21,9 @@ def main():
     os.makedirs('checkpoints', exist_ok=True)
     os.makedirs('logs', exist_ok=True)
 
+    if args.workers is not None and args.parallel_strategy is None:
+        raise ValueError('To use a defined number of workers, set the parallel-strategy argument')
+
     filename = args.model + '_' + datetime.now().strftime("%Y-%b-%d-%H:%M:%S")
     if args.name:
         filename = args.name + '_' + filename

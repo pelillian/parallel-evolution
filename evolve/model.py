@@ -39,18 +39,6 @@ class LinearModel(Model):
             X_shape = (X_shape[0] + 1,)
         return X_shape + (self.output_size, )
 
-class NeuralModel(Model):
-    def __init__(self):
-        """Defines a neural network predictor."""
-        raise NotImplementedError
-
-    def predict(self, X, params):
-        """Use neural model to predict y given X. Input: np.ndarray."""
-        pass
-
-    def param_shape(self, X_shape):
-        pass
-
 def get_model(model_type, **kwargs):
     if model_type == 'linear':
         return LinearModel(**kwargs)
