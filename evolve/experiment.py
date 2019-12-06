@@ -41,7 +41,6 @@ def main():
 
     logger.add_output(dowel.StdOutput())
     logger.add_output(dowel.TextOutput(log))
-    logger.log('Starting Evolutionary Algorithm!')
     logger.log(str(args))
 
     if args.objective == 'train':
@@ -50,9 +49,11 @@ def main():
                 X_train,
                 y_train,
                 num_classes,
+                num_workers=args.workers,
                 pop_size=args.population,
                 num_gen=args.generations,
                 fit_cutoff=args.fitness_cutoff,
+                target_accuracy=args.target_accuracy,
                 noise_sigma=args.noise_sigma,
                 checkpoint=checkpoint_file,
                 population=population,

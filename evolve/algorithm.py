@@ -10,8 +10,23 @@ from evolve.model import get_model
 from evolve.mutate import add_noise_to_array
 
 
-def train(model_type, X_train, y_train, num_classes, pop_size=10, num_gen=100, fit_cutoff=70, noise_sigma=0.1, checkpoint='checkpoint.npy', population=None):
+def train(
+            model_type,
+            X_train,
+            y_train,
+            num_classes,
+            num_workers=1,
+            pop_size=10,
+            num_gen=100,
+            fit_cutoff=70,
+            noise_sigma=0.1,
+            checkpoint='checkpoint.npy',
+            population=None,
+            target_accuracy=None,
+        ):
     """Primary train loop."""
+    logger.log('Starting Evolutionary Algorithm!')
+
     model = get_model(model_type, num_classes=num_classes)
 
     individual_shape = model.param_shape(X_train[0].shape)
@@ -58,6 +73,10 @@ def train(model_type, X_train, y_train, num_classes, pop_size=10, num_gen=100, f
 
         if gen % 10 == 0 or gen == num_gen - 1:
             logger.log(tabular)
+            if target_accuracy is not None and 100 * np.max(accuracy_scores) > target_accuracy:
+                logger.log('Stopping early because target accuracy reached')
+                return population
+
         logger.dump_all()
 
         if gen % 100 == 0 or gen == num_gen - 1:
@@ -86,10 +105,14 @@ def test(model_type, population, X_test, y_test, num_classes):
         accuracy_scores[idx] = accuracy
 
     tabular.clear()
-    tabular.record('Test Fitness Best', np.min(fitness_scores))
-    tabular.record('Test Fitness Mean', np.mean(fitness_scores))
-    tabular.record('Test Accuracy Best', np.max(accuracy_scores))
-    tabular.record('Test Accuracy Mean', np.mean(accuracy_scores))
+    if len(population) > 1:
+        tabular.record('Test Fitness Best', np.min(fitness_scores))
+        tabular.record('Test Fitness Mean', np.mean(fitness_scores))
+        tabular.record('Test Accuracy Best', np.max(accuracy_scores))
+        tabular.record('Test Accuracy Mean', np.mean(accuracy_scores))
+    else:
+        tabular.record('Test Fitness', fitness_scores[0])
+        tabular.record('Test Accuracy', fitness_scores[0])
     logger.log(tabular)
     logger.dump_all()
 
