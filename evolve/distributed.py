@@ -42,16 +42,30 @@ def train(
     if population is None:
         population = np.random.rand(*pop_shape)
     assert population.shape == pop_shape
+    if num_workers > pop_size:
+        raise ValueError('Number of workers must be greater than population size.')
 
     num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))
     if num_fit == pop_size:
         raise ValueError('fit_cutoff too low')
+    if pop_size % num_workers != 0:
+        raise ValueError('num_workers must divide pop_size evenly')
 
-    for gen in range(num_gen):
+    num_remote_gen = 50
+    fitness_scores = np.zeros(pop_size)
+    accuracy_scores = np.zeros(pop_size)
+
+    for gen in range(0, num_gen, num_remote_gen):
         start_gen = datetime.now()
-        tabular.record('Generation', gen)
+        tabular.record('Generation', str(gen) + ' - ' + str(gen + num_remote_gen))
 
-        fitness_scores, accuracy_scores = evaluate_population(model, population, X_train, y_train)
+        worker_pop_size = pop_size // num_workers
+        worker_population_list = [population[w:w+worker_pop_size] for w in range(0, pop_size, worker_pop_size)]
+        return_vals = ray.get([worker.remote(model, worker_population, X_train, y_train, num_remote_gen, fit_cutoff, noise_sigma) for worker_population in worker_population_list])
+        population, fitness_scores, accuracy_scores = zip(*return_vals)
+        population = np.vstack(population).reshape(pop_shape)
+        fitness_scores = np.vstack(fitness_scores).reshape(pop_size)
+        accuracy_scores = np.vstack(accuracy_scores).reshape(pop_size)
 
         fit_idx = fitness_scores.argsort()[:num_fit]
         unfit_idx = fitness_scores.argsort()[num_fit:]
@@ -76,8 +90,8 @@ def train(
                 population[idx] = np.random.rand(*individual_shape)
 
         gen_time = datetime.now() - start_gen
-        tabular.record('Execution Time', gen_time.total_seconds())
-        if gen % log_gen == 0 or gen == num_gen - 1:
+        tabular.record('Execution Time Mean', gen_time.total_seconds() / num_remote_gen)
+        if gen % log_gen == 0 or gen >= num_gen - num_remote_gen:
             logger.log(tabular)
             if target_accuracy is not None and 100 * np.max(accuracy_scores) > target_accuracy:
                 logger.log('Stopping early because target accuracy reached')
@@ -85,20 +99,23 @@ def train(
 
         logger.dump_all()
 
-        if gen % save_gen == 0 or gen == num_gen - 1:
+        if gen % save_gen == 0 or gen >= num_gen - num_remote_gen:
             np.save(checkpoint, population)
 
     return population
 
 @ray.remote
-def worker(model, population, X, y, num_gen):
+def worker(model, population, X, y, num_gen, fit_cutoff, noise_sigma):
+    num_fit = int(round( (1 - (fit_cutoff / 100)) * len(population) ))
+    population = np.copy(population)
+
     for gen in range(num_gen):
-        fitness_scores, accuracy_scores = evaluate_population(model, population, X_train, y_train)
+        fitness_scores, accuracy_scores = evaluate_population(model, population, X, y)
 
         fit_idx = fitness_scores.argsort()[:num_fit]
         unfit_idx = fitness_scores.argsort()[num_fit:]
         fit_individuals = population[fit_idx]
-        assert 0 < len(fit_individuals) < pop_size
+        assert 0 < len(fit_individuals) < len(population)
 
         for idx in unfit_idx:
             choice = np.random.choice([0, 1, 2], p=[0.8, 0.2, 0])
