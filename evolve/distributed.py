@@ -43,13 +43,13 @@ def train(
         population = np.random.rand(*pop_shape)
     assert population.shape == pop_shape
     if num_workers > pop_size:
-        raise ValueError('Number of workers must be greater than population size.')
+        raise ValueError('The number of workers must be greater than the population size.')
 
     num_fit = int(round( (1 - (fit_cutoff / 100)) * pop_size ))
     if num_fit == pop_size:
         raise ValueError('fit_cutoff too low')
     if pop_size % num_workers != 0:
-        raise ValueError('num_workers must divide pop_size evenly')
+        raise ValueError('The number of workers must divide the population size evenly.')
 
     num_remote_gen = 50
     fitness_scores = np.zeros(pop_size)
