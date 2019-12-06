@@ -57,7 +57,7 @@ def train(
 
     for gen in range(0, num_gen, num_remote_gen):
         start_gen = datetime.now()
-        tabular.record('Generation', str(gen) + ' - ' + str(gen + num_remote_gen))
+        tabular.record('Generation', str(gen) + ' - ' + str(gen + num_remote_gen - 1))
 
         worker_pop_size = pop_size // num_workers
         worker_population_list = [population[w:w+worker_pop_size] for w in range(0, pop_size, worker_pop_size)]
