@@ -36,12 +36,12 @@ def main():
     if args.checkpoint:
         population = np.load(os.path.join('checkpoints', args.checkpoint + '.npy'))
 
-    X_train, X_test, y_train, y_test, num_classes = get_mnist()
-    logger.log('Loaded Dataset')
-
     logger.add_output(dowel.StdOutput())
     logger.add_output(dowel.TextOutput(log))
     logger.log(str(args))
+
+    X_train, X_test, y_train, y_test, num_classes = get_mnist()
+    logger.log('Loaded Dataset')
 
     if args.objective == 'train':
         population = train(
