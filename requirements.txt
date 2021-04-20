@@ -15,7 +15,7 @@ numpy==1.17.4
 packaging==19.2
 pluggy==0.13.1
 protobuf==3.11.1
-py==1.8.0
+py==1.10.0
 pyparsing==2.4.5
 pyrsistent==0.15.6
 pytest==5.3.1
